@@ -235,7 +235,7 @@ void print_italians_over_30(racer* racers){
         
         /* prints 140 # if not the same person to seperate different people */
         if(is_former_same_person == 0)
-            printf("\n\n#################################################################### \n\n");
+            printf("\n\n######################################################################################### \n\n");
         
         if(is_former_same_person == 0)
             printf("%s, %s    age: %d    nationality: %s \n", racer_pointer[loop].last_name, racer_pointer[loop].name, racer_pointer[loop].age, racer_pointer[loop].nationality);
