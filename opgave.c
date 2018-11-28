@@ -4,7 +4,7 @@
 #include <string.h>
 
 #define MAX_NAME_LGT 30
-#define MAX_NUMBER_OF_RACERS 800 
+#define MAX_NUMBER_OF_RACERS 790 
 #define OTL 9999999
 #define DNF 99999999
 #define MAX 999999999
@@ -17,6 +17,8 @@ typedef struct {
 void load_racers(racer*);
 void calc_points(racer*);
 int sort_racers_by_race_name(const void*, const void*);
+void italians_over_30(racer*);
+int sort_italians_over_30(const void*, const void*);
 
 
 
@@ -28,9 +30,12 @@ int main(void){
     /* loads racers from file to array */
     load_racers(racers);
     calc_points(racers);
+    
+    italians_over_30(racers);
    
-    printf("name: %s last name: %s \n", racers[220 - 1].name, racers[220 - 1].last_name);
-    printf("position: %d points: %d \n", racers[220 - 1].position, racers[220 - 1].points);
+    printf("name: %s last name: %s \n", racers[420 - 1].name, racers[420 - 1].last_name);
+    printf("position: %d points: %d time: %d\n", racers[420 - 1].position, racers[420 - 1].points, racers[420 - 1].time_total_secs);
+    printf("nationality: %s team: %s age: %d \n", racers[420 - 1].nationality, racers[420 - 1].team, racers[420 - 1].age);
   
     return 0;
 }
@@ -44,7 +49,7 @@ void load_racers(racer* racers){
     
     racer* racer_pointer = racers;
     
-    /* loads in first and last name */
+    /* load racers loop */
     while(feof(data) == 0){
         fscanf(data, " %s \"", racer_pointer->race_name);
         
@@ -67,7 +72,7 @@ void load_racers(racer* racers){
             }
                 
         }
-        racer_pointer->name[loop--] = '\0';
+        racer_pointer->name[--loop] = '\0';
         
         /* load in last name and convert letters to lowercase other than first in a given name */
         loop = 1;
@@ -85,12 +90,16 @@ void load_racers(racer* racers){
                 break;
             }
         }
-         racer_pointer->last_name[loop] = '\0';
+        racer_pointer->last_name[loop] = '\0';
         
-        /* loads age, team and nationality */
+        /* loads age, team and nationality */       
         fscanf(data, " | %d", &racer_pointer->age);
+        printf("%d \n", racer_pointer->age);
+
         fscanf(data, " %s", racer_pointer->team);
         fscanf(data, " %s |", racer_pointer->nationality);
+
+        /* racer_pointer->age = 30; */       
         
         /* scans in posistion */
         fscanf(data, " %c", &first_letter);
@@ -181,5 +190,39 @@ int sort_racers_by_race_name(const void* a, const void* b){
     
     return strcmp(pa->race_name, pb->race_name);
 }
+
+void italians_over_30(racer* racers){
+    
+    qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_italians_over_30);
+    
+}
+
+int sort_italians_over_30(const void* a, const void* b){
+    
+    racer *pa = (racer*)a, *pb = (racer*)b;
+    
+    if((strcmp(pb->nationality, "ITA") == 0) && !(strcmp(pb->nationality, "ITA") == 0))
+        return -1;
+    else if (!(strcmp(pb->nationality, "ITA") == 0) && (strcmp(pb->nationality, "ITA") == 0))
+        return 1;
+    else if (pa->age >= 30 && pa->age < 30)
+        return -1;
+    else if(pa->age < 30 && pa->age >= 30)
+        return 1;
+    else if(pa->time_total_secs < pb->time_total_secs) 
+        return -1;
+    else if(pa->time_total_secs > pb->time_total_secs)
+        return 1;
+    
+    return 0;
+}
+
+
+
+
+
+
+
+
 
 
