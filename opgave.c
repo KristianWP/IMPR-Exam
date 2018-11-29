@@ -122,7 +122,7 @@ void load_racers(racer* racers){
         }
         
         /* loads in time to finish race */
-        fscanf(data, " %c", &first_letter);
+        fscanf(data, " %c ", &first_letter);
         if(isdigit(first_letter)){
             ungetc(first_letter, data);
             fscanf(data, " %d:", &racer_pointer->hours);
@@ -135,20 +135,10 @@ void load_racers(racer* racers){
             racer_pointer->minutes = MAX;
             racer_pointer->secounds = MAX;
             racer_pointer->time_total_secs = MAX;
-        }
-
-        /* printf("name: %s last name: %s \n", racer_pointer->name, racer_pointer->last_name); */
-        
-        x++;
-        /* printf("%d \n", x); */
-        
-        /* FIND BETTER SOLUTION! */
-        if(x == 790)
-            break;
-        
+        }                
         racer_pointer++;
     }
-    fclose(data);  
+    fclose(data);        
 }
 
 void calc_points(racer* racers){
@@ -235,17 +225,17 @@ void print_italians_over_30(racer* racers){
         
         /* prints 140 # if not the same person to seperate different people */
         if(is_former_same_person == 0)
-            printf("\n\n######################################################################################### \n\n");
+            printf("\n######################################################################################### \n\n");
         
         if(is_former_same_person == 0)
-            printf("%s, %s    age: %d    nationality: %s \n", racer_pointer[loop].last_name, racer_pointer[loop].name, racer_pointer[loop].age, racer_pointer[loop].nationality);
+            printf("%s, %s    age: %d    nationality: %s \n\n", racer_pointer[loop].last_name, racer_pointer[loop].name, racer_pointer[loop].age, racer_pointer[loop].nationality);
         
         if(racer_pointer[loop].position == OTL)
-            printf("\n%-30s    position: OTL   time:  OTL       points earned: %d", racer_pointer[loop].race_name, racer_pointer[loop].points);
+            printf("%-30s    position: OTL   time:  OTL       points earned: %d \n", racer_pointer[loop].race_name, racer_pointer[loop].points);
         if(racer_pointer[loop].position == DNF)
-            printf("\n%-30s    position: DNF   time:  DNF       points earned: %d", racer_pointer[loop].race_name, racer_pointer[loop].points); 
+            printf("%-30s    position: DNF   time:  DNF       points earned: %d \n", racer_pointer[loop].race_name, racer_pointer[loop].points); 
         else    
-            printf("\n%-30s    position: %3d   time: %d:%d:%d   points earned: %d", racer_pointer[loop].race_name, racer_pointer[loop].position, racer_pointer[loop].hours, racer_pointer[loop].minutes, racer_pointer[loop].secounds, racer_pointer[loop].points);
+            printf("%-30s    position: %3d   time: %d:%d:%d   points earned: %d \n", racer_pointer[loop].race_name, racer_pointer[loop].position, racer_pointer[loop].hours, racer_pointer[loop].minutes, racer_pointer[loop].secounds, racer_pointer[loop].points);
         
     }
 }
