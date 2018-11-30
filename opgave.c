@@ -455,8 +455,8 @@ int is_amstel_or_paris(racer* a){
 
 void avrage_age_of_top_10(racer* racers){
     
-    int loop = 0, number_of_people = 0, total_age = 0;
-    int avarage_age;
+    int loop = 0, number_of_people = 0;
+    double avarage_age = 0;
     racer* racer_pointer = racers;
     
     qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_top_10);
@@ -464,14 +464,13 @@ void avrage_age_of_top_10(racer* racers){
     for(loop = 0; racer_pointer[loop].position <= 10; loop++){
         if((strcmp(racer_pointer[loop].name, racer_pointer[loop - 1].name) != 0)){
             number_of_people++;
-            total_age = racer_pointer[loop].age + total_age;
+            avarage_age += racer_pointer[loop].age;
         }
     }
-    printf("%d, %d \n", total_age, number_of_people);
 
-    avarage_age = (total_age / number_of_people);
+    avarage_age = avarage_age / number_of_people;
     
-    printf("the avarage age of the top 10 racers is: %d", avarage_age);
+    printf("the avarage age of the top 10 racers is: %.2lf \n", avarage_age);
     
 }
 
