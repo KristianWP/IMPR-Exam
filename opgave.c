@@ -34,6 +34,13 @@ danish_racer make_danish_racer_array(racer*);
 */
 int sort_racers_by_name(const void*, const void*);
 void calc_total_points(racer*);
+void most_points_total(racer*);
+int sort_max_points(const void*, const void*);
+void best_time_in_paris_amstel(racer*);
+int sort_paris_amstel(const void*, const void*);
+int is_amstel_or_paris(racer*);
+
+
 
 int main(void){
     
@@ -44,13 +51,16 @@ int main(void){
     racer racers[MAX_NUMBER_OF_RACERS];
    
     /* loads racers from file to array */
-    load_racers(racers);
+    load_racers(racers);  
     calc_points(racers);
-    
     
     scanf(" %d", &input);
     if(input == 1)
         italians_over_30(racers);
+    if(input == 2)
+        most_points_total(racers);
+    if(input == 3)
+        best_time_in_paris_amstel(racers);
     
     /*
     for(x = 0; x < 20; x++){
@@ -178,20 +188,30 @@ void calc_points(racer* racers){
                 break;
             }
         }
-        total_racers++;
         
-        /* calculates points for the racers in the race */
+        /* calculates points for the racers in each race */
         loop = 0;
         while(loop < total_racers){
-            if(racer_pointer[start_from + loop].position == OTL){
-                racer_pointer[start_from + loop].points = 1;
-            }
-            else if(racer_pointer[start_from + loop].position == DNF){
-                racer_pointer[start_from + loop].points = 0;
-            }
-            else{
-                racer_pointer[start_from + loop].points = (total_racers - loop) / 13 + 3;
-            }
+            racer_pointer[start_from + loop].points = 0;
+            
+            if(!(racer_pointer[start_from + loop].position == DNF)){
+                racer_pointer[start_from + loop].points += 1;
+                
+                if(!(racer_pointer[start_from + loop].position == OTL)){
+                    racer_pointer[start_from + loop].points += 2;
+                
+                        switch(racer_pointer[start_from + loop].position){
+                            case 1:
+                                racer_pointer[start_from + loop].points += 10; break;
+                            case 2:
+                                racer_pointer[start_from + loop].points += 5; break;
+                            case 3:
+                                racer_pointer[start_from + loop].points += 2; break;
+                        }
+                            
+                    racer_pointer[start_from + loop].points += (total_racers - loop) / 13;
+                }
+            }    
             loop++;
         }
         start_from += total_racers;   
@@ -347,8 +367,86 @@ void calc_total_points(racer* racers){
             --number_of_times_listed;
         }  
     }
+}
+
+void most_points_total(racer* racers){
     
-    printf("made it");
+    int number_of_racers = 1, x = 0;
+    racer* racer_pointer = racers;
+    
+    qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_max_points);    
+    
+    while(number_of_racers <= 10){
+        
+        if(!(strcmp(racer_pointer[x].name, racer_pointer[x - 1].name) == 0) && !(strcmp(racer_pointer[x].last_name, racer_pointer[x - 1].last_name) == 0)){
+            printf("%s, %s       total points earned: %-4d \n\n", racer_pointer[x].last_name, racer_pointer[x].name, racer_pointer[x].total_points);
+            number_of_racers++;
+        }
+        x++;
+    }
+}
+
+int sort_max_points(const void* a, const void* b){
+    
+    racer *pa = (racer*)a, *pb = (racer*)b;
+    int result;
+    
+    if(pa->total_points > pb->total_points)
+        return -1;    
+    if(pa->total_points < pb->total_points)
+        return 1;
+    
+
+    result = strcmp(pa->last_name, pb->last_name);
+    if (result == 0)
+        return strcmp(pa->name, pb->name);
+    
+    return result;
+}
+
+void best_time_in_paris_amstel(racer* racers){
+    
+    int loop = 1, best_result = MAX, current_result, posistion_in_array;
+    racer* racer_pointer = racers;
+    
+    qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_paris_amstel);
+    
+    while(is_amstel_or_paris(&racer_pointer[loop])){
+        
+        if((strcmp(racer_pointer[loop].name, racer_pointer[loop - 1].name) == 0) && (strcmp(racer_pointer[loop].last_name, racer_pointer[loop - 1].last_name) == 0))
+            current_result = racer_pointer[loop].time_total_secs + racer_pointer[loop - 1].time_total_secs;
+            
+        if(current_result < best_result){
+            best_result = current_result;
+            posistion_in_array = loop;
+        }
+        loop++;
+    }
+    
+    printf("best result: %s %s     time: ", racer_pointer[posistion_in_array].name, racer_pointer[posistion_in_array].last_name);
+    printf("%d:%d:%d", best_result / 3600, (best_result % 3600) / 60, best_result % 60);
+}
+
+int sort_paris_amstel(const void* a, const void* b){
+    
+    int result;
+    racer *pa = (racer*)a, *pb = (racer*)b;
+    
+    if(is_amstel_or_paris(pa) && !is_amstel_or_paris(pb))
+        return -1;
+    else if (!is_amstel_or_paris(pa) && is_amstel_or_paris(pb))
+        return 1;
+    
+    result = strcmp(pa->last_name, pb->last_name);
+    if (result == 0)
+        return strcmp(pa->name, pb->name);
+    
+    return result;
+    
+}
+
+int is_amstel_or_paris(racer* a){
+    return ((strcmp(a->race_name, "AmstelGoldRace") == 0) || (strcmp(a->race_name, "ParisRoubaix") == 0));
 }
 
 
