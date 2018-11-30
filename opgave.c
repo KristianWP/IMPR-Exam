@@ -39,6 +39,8 @@ int sort_max_points(const void*, const void*);
 void best_time_in_paris_amstel(racer*);
 int sort_paris_amstel(const void*, const void*);
 int is_amstel_or_paris(racer*);
+void avrage_age_of_top_10(racer*);
+int sort_top_10(const void*, const void*);
 
 
 
@@ -61,6 +63,8 @@ int main(void){
         most_points_total(racers);
     if(input == 3)
         best_time_in_paris_amstel(racers);
+    if(input == 4)
+        avrage_age_of_top_10(racers);
     
     /*
     for(x = 0; x < 20; x++){
@@ -177,7 +181,7 @@ void calc_points(racer* racers){
     /* qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_racers_by_race_name); */
     
 
-    while(start_from <= MAX_NUMBER_OF_RACERS){
+    while(start_from < MAX_NUMBER_OF_RACERS){
         
         /* counts number of racers in the different races */
         total_racers = 1;
@@ -449,7 +453,42 @@ int is_amstel_or_paris(racer* a){
     return ((strcmp(a->race_name, "AmstelGoldRace") == 0) || (strcmp(a->race_name, "ParisRoubaix") == 0));
 }
 
+void avrage_age_of_top_10(racer* racers){
+    
+    int loop = 0, number_of_people = 0, total_age = 0;
+    int avarage_age;
+    racer* racer_pointer = racers;
+    
+    qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_top_10);
+    
+    for(loop = 0; racer_pointer[loop].position <= 10; loop++){
+        if((strcmp(racer_pointer[loop].name, racer_pointer[loop - 1].name) != 0)){
+            number_of_people++;
+            total_age = racer_pointer[loop].age + total_age;
+        }
+    }
+    printf("%d, %d \n", total_age, number_of_people);
 
+    avarage_age = (total_age / number_of_people);
+    
+    printf("the avarage age of the top 10 racers is: %d", avarage_age);
+    
+}
 
-
+int sort_top_10(const void* a, const void* b){
+    
+    int result;
+    racer *pa = (racer*)a, *pb = (racer*)b;
+    
+    if((pa->position <= 10) && !(pb->position <= 10))
+        return -1;
+    if(!(pa->position <= 10) && (pb->position <= 10))
+        return 1;
+    
+    result = strcmp(pa->last_name, pb->last_name);
+    if (result == 0)
+        return strcmp(pa->name, pb->name);
+    
+    return result;
+}
 
