@@ -50,9 +50,9 @@ int main(int number_of_terminal_inputs, char **terminal_input){
    
     /* loads racers from file to array */
     load_racers(racers);  
-	
+	/*
 	take_terminal_input(terminal_input, racers);
-	
+	*/
 	take_user_input(racers);
 
     return 0;
@@ -176,26 +176,26 @@ void calc_points(racer* racers){
         }
         
         /* calculates points for the racers in each race */
-        loop = 0;
-        while(loop < total_racers){
-            racer_pointer[start_from + loop].points = 0;
+        loop = 1;
+        while(loop <= total_racers){
+            racer_pointer[start_from + loop - 1].points = 0;
             
-            if(!(racer_pointer[start_from + loop].position == DNF)){
-                racer_pointer[start_from + loop].points += 1;
+            if(!(racer_pointer[start_from + loop - 1].position == DNF)){
+                racer_pointer[start_from + loop - 1].points += 1;
                 
-                if(!(racer_pointer[start_from + loop].position == OTL)){
-                    racer_pointer[start_from + loop].points += 2;
+                if(!(racer_pointer[start_from + loop - 1].position == OTL)){
+                    racer_pointer[start_from + loop - 1].points += 2;
                 
-                        switch(racer_pointer[start_from + loop].position){
+                        switch(racer_pointer[start_from + loop - 1].position){
                             case 1:
-                                racer_pointer[start_from + loop].points += 10; break;
+                                racer_pointer[start_from + loop - 1].points += 10; break;
                             case 2:
-                                racer_pointer[start_from + loop].points += 5; break;
+                                racer_pointer[start_from + loop - 1].points += 5; break;
                             case 3:
-                                racer_pointer[start_from + loop].points += 2; break;
+                                racer_pointer[start_from + loop - 1].points += 2; break;
                         }
                             
-                    racer_pointer[start_from + loop].points += (total_racers - loop) / 13;
+                    racer_pointer[start_from + loop - 1].points += (total_racers - loop) / 13;
                 }
             }    
             loop++;
