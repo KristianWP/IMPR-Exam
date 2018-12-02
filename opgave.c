@@ -42,6 +42,10 @@ void take_user_input(racer*);
 void italians_over_30_compact(racer*);
 void print_all_info(racer*);
 void load_names(FILE*, racer*);
+void load_position(FILE*, racer*);
+void load_time(FILE*, racer*);
+int count_racers_in_race(racer*, int);
+void calc_points_per_racer(racer*, int, int);
 
 
 
@@ -61,8 +65,7 @@ int main(int number_of_terminal_inputs, char **terminal_input){
 }
 
 void load_racers(racer* racers){
-    
-    char test_letter;    
+        
     FILE *data = fopen("cykelloeb", "r");    
     racer* racer_pointer = racers;
     
@@ -77,43 +80,56 @@ void load_racers(racer* racers){
         fscanf(data, " %s", racer_pointer->team);
         fscanf(data, " %s |", racer_pointer->nationality);   
         
-        /* scans in position */
-        fscanf(data, " %c", &test_letter);
-        if(isdigit(test_letter)){
-            ungetc(test_letter, data);
-            fscanf(data, " %d", &racer_pointer->position);
-        }
-        else if (test_letter == 'O'){
-            racer_pointer->position = OTL;
-            while(test_letter != ' ')
-                fscanf(data, "%c", &test_letter);
-        }
-        else{
-            racer_pointer->position = DNF;
-            while(test_letter != ' ')
-                fscanf(data, "%c", &test_letter);
-        }
+        load_position(data, racer_pointer);
         
-        /* loads in time to finish race */
-        fscanf(data, " %c ", &test_letter);
-        if(isdigit(test_letter)){
-            ungetc(test_letter, data);
-            fscanf(data, " %d:", &racer_pointer->hours);
-            fscanf(data, " %d:", &racer_pointer->minutes);
-            fscanf(data, " %d", &racer_pointer->secounds);
-            racer_pointer->time_total_secs = racer_pointer->hours * 3600 + racer_pointer->minutes * 60 + racer_pointer->secounds;
-        }
-        else{
-            racer_pointer->hours = MAX;
-            racer_pointer->minutes = MAX;
-            racer_pointer->secounds = MAX;
-            racer_pointer->time_total_secs = MAX;
-        }                
+        load_time(data, racer_pointer);
+        
         racer_pointer++;
     }
     fclose(data);
 
 	calc_points(racers);	
+}
+
+void load_time(FILE* data, racer* racer_pointer){
+        
+    char test_letter;    
+        
+    fscanf(data, " %c ", &test_letter);
+    if(isdigit(test_letter)){
+        ungetc(test_letter, data);
+        fscanf(data, " %d:", &racer_pointer->hours);
+        fscanf(data, " %d:", &racer_pointer->minutes);
+        fscanf(data, " %d", &racer_pointer->secounds);
+        racer_pointer->time_total_secs = racer_pointer->hours * 3600 + racer_pointer->minutes * 60 + racer_pointer->secounds;
+    }
+    else{
+        racer_pointer->hours = MAX;
+        racer_pointer->minutes = MAX;
+        racer_pointer->secounds = MAX;
+        racer_pointer->time_total_secs = MAX;
+    }
+}        
+
+void load_position(FILE* data,racer* racer_pointer){
+
+    char test_letter;
+
+    fscanf(data, " %c", &test_letter);
+    if(isdigit(test_letter)){
+        ungetc(test_letter, data);
+        fscanf(data, " %d", &racer_pointer->position);
+    }
+    else if (test_letter == 'O'){
+        racer_pointer->position = OTL;
+        while(test_letter != ' ')
+            fscanf(data, "%c", &test_letter);
+    }
+    else{
+        racer_pointer->position = DNF;
+        while(test_letter != ' ')
+            fscanf(data, "%c", &test_letter);    
+    }
 }
 
 void load_names(FILE *data, racer* racer_pointer){
@@ -163,54 +179,62 @@ void load_names(FILE *data, racer* racer_pointer){
 
 void calc_points(racer* racers){
 
-    int total_racers, loop, start_from = 0;
-    racer* racer_pointer = racers;
-    
-    /* sorts racers by race name */
-    /* qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_racers_by_race_name); */
-    
+    int total_racers, start_from = 0;
 
     while(start_from < MAX_NUMBER_OF_RACERS){
         
-        /* counts number of racers in the different races */
-        total_racers = 1;
-        while(strcmp(racer_pointer[start_from + total_racers - 1].race_name, racer_pointer[start_from + total_racers].race_name) == 0){
-            total_racers++;
-            if(start_from + total_racers > MAX_NUMBER_OF_RACERS){
-                printf("error");
-                break;
-            }
-        }
+        total_racers = count_racers_in_race(racers, start_from);
         
-        /* calculates points for the racers in each race */
-        loop = 1;
-        while(loop <= total_racers){
-            racer_pointer[start_from + loop - 1].points = 0;
-            
-            if(!(racer_pointer[start_from + loop - 1].position == DNF)){
-                racer_pointer[start_from + loop - 1].points += 1;
-                
-                if(!(racer_pointer[start_from + loop - 1].position == OTL)){
-                    racer_pointer[start_from + loop - 1].points += 2;
-                
-                        switch(racer_pointer[start_from + loop - 1].position){
-                            case 1:
-                                racer_pointer[start_from + loop - 1].points += 10; break;
-                            case 2:
-                                racer_pointer[start_from + loop - 1].points += 5; break;
-                            case 3:
-                                racer_pointer[start_from + loop - 1].points += 2; break;
-                        }
-                            
-                    racer_pointer[start_from + loop - 1].points += (total_racers - loop) / 13;
-                }
-            }    
-            loop++;
-        }
+        calc_points_per_racer(racers, start_from, total_racers);
+        
         start_from += total_racers;   
     }
     
     calc_total_points(racers);
+}
+
+void calc_points_per_racer(racer* racer_pointer, int start_from, int total_racers){
+
+    int loop = 1;
+    
+    while(loop <= total_racers){
+        racer_pointer[start_from + loop - 1].points = 0;
+            
+        if(!(racer_pointer[start_from + loop - 1].position == DNF)){
+            racer_pointer[start_from + loop - 1].points += 1;
+        
+            if(!(racer_pointer[start_from + loop - 1].position == OTL)){
+                racer_pointer[start_from + loop - 1].points += 2;
+            
+                    switch(racer_pointer[start_from + loop - 1].position){
+                        case 1:
+                            racer_pointer[start_from + loop - 1].points += 10; break;
+                        case 2:
+                            racer_pointer[start_from + loop - 1].points += 5; break;
+                        case 3:
+                            racer_pointer[start_from + loop - 1].points += 2; break;
+                    }
+                        
+                racer_pointer[start_from + loop - 1].points += (total_racers - loop) / 13;
+            }
+        }    
+    loop++;
+    }    
+}
+
+int count_racers_in_race(racer* racer_pointer, int start_from){
+    
+    int total_racers = 1;
+    
+    while(strcmp(racer_pointer[start_from + total_racers - 1].race_name, racer_pointer[start_from + total_racers].race_name) == 0){
+        total_racers++;
+        if(start_from + total_racers > MAX_NUMBER_OF_RACERS){
+            printf("error");
+            break;
+        }
+    }
+        
+    return total_racers;
 }
 
 int sort_italians_over_30(const void* a, const void* b){
@@ -241,6 +265,7 @@ void italians_over_30(racer* racers){
     
     qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_italians_over_30);
     
+    /* prints racers one by one, includeing all the races competed in and seperated by lines */
     for(loop = 0; strcmp(racer_pointer[loop].nationality, "ITA") == 0 && racer_pointer[loop].age >= 30; loop++){
         
         if (strcmp(racer_pointer[loop].last_name, racer_pointer[loop -1].last_name) == 0 && strcmp(racer_pointer[loop].name, racer_pointer[loop -1].name) == 0)
@@ -263,7 +288,6 @@ void italians_over_30(racer* racers){
             printf("%-30s    position: %3d   time: %2d:%2d:%2d   points earned: %d \n", racer_pointer[loop].race_name, racer_pointer[loop].position, racer_pointer[loop].hours, racer_pointer[loop].minutes, racer_pointer[loop].secounds, racer_pointer[loop].points);
         
     }
-    
     printf("___________________________________________________________________________________________________ \n\n");
 }
 
@@ -274,10 +298,12 @@ void italians_over_30_compact(racer* racers){
     
     qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_italians_over_30);
     
+    /* prints header */
 	printf("\n Racers from italy, older then 30: \n\n");
-    printf("     First name          | Last name           | Nationality | age  | Races competed in \n");
-    printf("    ---------------------|---------------------|-------------|------|-------------------\n");
+    printf("     First name          | Last name           | age  | Races competed in \n");
+    printf("    ---------------------|---------------------|------|-------------------\n");
 	
+    /* prints racers who fit the critiria */
     for(loop = 0; strcmp(racer_pointer[loop].nationality, "ITA") == 0 && racer_pointer[loop].age >= 30; loop++){
         
         number_of_times_listed = 1;
@@ -287,7 +313,7 @@ void italians_over_30_compact(racer* racers){
 			loop++;
 		}
     
-    printf("     %-20s| %-20s|     %s     |  %d  |          %d \n", racer_pointer[loop].name, racer_pointer[loop].last_name, racer_pointer[loop].nationality, racer_pointer[loop].age, number_of_times_listed);
+        printf("     %-20s| %-20s|  %d  |          %d \n", racer_pointer[loop].name, racer_pointer[loop].last_name, racer_pointer[loop].age, number_of_times_listed);
         
 	}
 }
@@ -299,13 +325,16 @@ void danes_who_has_completed_a_race(racer* racers){
     
     danish_racers = (danish_racer*) make_danish_racer_array(racers);
 
+    /* prints header */
     printf("\n Danish racers who has finished 1 or more races: \n\n");
     printf("     First name          | Last name           | Completed races \n");
     printf("    ---------------------|---------------------|---------------------\n");
     
+    /* prints all info in the array, until racer named "end of list" */
     while(strcmp(danish_racers[++loop].name, "end of list") != 0)
         printf("     %-20s| %-20s| %d races completed \n", danish_racers[loop].name, danish_racers[loop].last_name, danish_racers[loop].number_of_completed_races);
 
+    /* free's array inisiated in make_danish_racer_array */
     free(danish_racers);
 }
 
@@ -323,12 +352,14 @@ danish_racer* make_danish_racer_array(racer *racers){
         
         number_of_races = 0;
         
+        /* counts number of races any given racer has been a part of and finished*/
         do{
             x++;
             if(racer_pointer[x].position != DNF)
                 number_of_races++;
         } while(strcmp(racer_pointer[x].name, racer_pointer[x + 1].name) == 0 && strcmp(racer_pointer[x].last_name, racer_pointer[x + 1].last_name) == 0);
         
+        /* saves any racer who has completed 1 or more races to an array */
         if(number_of_races != 0){
             strcpy(danish_racers[y].name, racer_pointer[x].name);
             strcpy(danish_racers[y].last_name, racer_pointer[x].last_name);
@@ -343,6 +374,7 @@ danish_racer* make_danish_racer_array(racer *racers){
         exit(EXIT_FAILURE);
     }
 
+    /* adds a racer named "end of list" below the last */
     strcpy(danish_racers[y].name, "end of list");  
     
     return danish_racers; 
@@ -389,12 +421,14 @@ void calc_total_points(racer* racers){
         total_points = racer_pointer[loop].points;
         number_of_times_listed = 0;
                 
+        /* counts if any charater is listed multiple times in a row, and adds the points together */
         while((strcmp(racer_pointer[loop].name, racer_pointer[loop + 1].name) == 0) && (strcmp(racer_pointer[loop].last_name, racer_pointer[loop + 1].last_name) == 0)){
             loop++;
             total_points += racer_pointer[loop].points;
             number_of_times_listed++;
         }
-            
+          
+        /* adds the total value of points to all the posistions where the racer is listed  */
         while(number_of_times_listed >= 0){
             racer_pointer[loop - number_of_times_listed].total_points = total_points;
             --number_of_times_listed;
@@ -448,6 +482,7 @@ void best_time_in_paris_amstel(racer* racers){
     
     qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_paris_amstel);
     
+    /* checks if any person is listed twice in a row, signifying they have partisipated in both races, then adding the times together and saving the fastest time */
     while(is_amstel_or_paris(&racer_pointer[loop])){
         
         if((strcmp(racer_pointer[loop].name, racer_pointer[loop - 1].name) == 0) && (strcmp(racer_pointer[loop].last_name, racer_pointer[loop - 1].last_name) == 0))
@@ -461,6 +496,8 @@ void best_time_in_paris_amstel(racer* racers){
     }
     
     printf("Fastest time in Paris Roubaix and Amstel Gold Race combined: %s %s   time: ", racer_pointer[posistion_in_array].name, racer_pointer[posistion_in_array].last_name);
+    
+    /* devides the total time in secounds into hours, minutes and secounds */
     printf("%d:%d:%d \n", best_result / 3600, (best_result % 3600) / 60, best_result % 60);
 }
 
@@ -494,6 +531,7 @@ void avrage_age_of_top_10(racer* racers){
     
     qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_top_10);
     
+    /* adds all ages together for every individual */
     for(loop = 0; racer_pointer[loop].position <= 10; loop++){
         if((strcmp(racer_pointer[loop].name, racer_pointer[loop - 1].name) != 0)){
             number_of_people++;
