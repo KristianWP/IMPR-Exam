@@ -40,6 +40,7 @@ void avrage_age_of_top_10(racer*);
 int sort_top_10(const void*, const void*);
 void take_terminal_input(char**, racer*);
 void take_user_input(racer*);
+void print_italians_over_30_compact(racer* racers);
 
 
 
@@ -50,9 +51,9 @@ int main(int number_of_terminal_inputs, char **terminal_input){
    
     /* loads racers from file to array */
     load_racers(racers);  
-	/*
+	
 	take_terminal_input(terminal_input, racers);
-	*/
+	
 	take_user_input(racers);
 
     return 0;
@@ -207,10 +208,10 @@ void calc_points(racer* racers){
 }
 
 void italians_over_30(racer* racers){
+	
+	qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_italians_over_30);
     
-    qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_italians_over_30);
-    
-    print_italians_over_30(racers);   
+    print_italians_over_30(racers);
 }
 
 int sort_italians_over_30(const void* a, const void* b){
@@ -239,8 +240,6 @@ void print_italians_over_30(racer* racers){
     int loop, is_former_same_person;
     racer* racer_pointer = racers;
     
-    
-    
     for(loop = 0; strcmp(racer_pointer[loop].nationality, "ITA") == 0 && racer_pointer[loop].age >= 30; loop++){
         
         if (strcmp(racer_pointer[loop].last_name, racer_pointer[loop -1].last_name) == 0 && strcmp(racer_pointer[loop].name, racer_pointer[loop -1].name) == 0)
@@ -263,6 +262,31 @@ void print_italians_over_30(racer* racers){
             printf("%-30s    position: %3d   time: %2d:%2d:%2d   points earned: %d \n", racer_pointer[loop].race_name, racer_pointer[loop].position, racer_pointer[loop].hours, racer_pointer[loop].minutes, racer_pointer[loop].secounds, racer_pointer[loop].points);
         
     }
+}
+
+void print_italians_over_30_compact(racer* racers){
+	
+    int loop, number_of_times_listed;
+    racer* racer_pointer = racers;
+    
+    qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_italians_over_30);
+    
+	printf("\n Racers from italy, older then 30: \n\n");
+    printf("     First name          | Last name           | Nationality | age  | Races competed in \n");
+    printf("    ---------------------|---------------------|-------------|------|-------------------\n");
+	
+    for(loop = 0; strcmp(racer_pointer[loop].nationality, "ITA") == 0 && racer_pointer[loop].age >= 30; loop++){
+        
+        number_of_times_listed = 1;
+		
+		while(strcmp(racer_pointer[loop].last_name, racer_pointer[loop +1].last_name) == 0 && strcmp(racer_pointer[loop].name, racer_pointer[loop +1].name) == 0){
+            number_of_times_listed += 1;
+			loop++;
+		}
+    
+    printf("     %-20s| %-20s|     %s     |  %d  |          %d \n", racer_pointer[loop].name, racer_pointer[loop].last_name, racer_pointer[loop].nationality, racer_pointer[loop].age, number_of_times_listed);
+        
+	}
 }
 
 void danes_who_has_completed_a_race(racer* racers){
@@ -500,10 +524,10 @@ int sort_top_10(const void* a, const void* b){
 void take_terminal_input(char** terminal_input, racer* racers){
 	
 	if(strcmp(terminal_input[1], "--print") == 0){
-        italians_over_30(racers);
-        printf("___________________________________________________________________________________________________ \n\n");
+        print_italians_over_30_compact(racers);
+        printf("___________________________________________________________________________________________________ \n");
         danes_who_has_completed_a_race(racers);
-        printf("___________________________________________________________________________________________________ \n\n");
+        printf("___________________________________________________________________________________________________ \n");
         most_points_total(racers);
         printf("___________________________________________________________________________________________________ \n\n");
         best_time_in_paris_amstel(racers);
@@ -521,24 +545,27 @@ void take_user_input(racer* racers){
 	do{
         printf("\ntype in the number corrosponding to the info you wish displayed \n\n");
         
-        printf("(1) Italians over 30 \n");
-        printf("(2) Danish riders who has completed 1 or more races \n");
-        printf("(3) Top 10 point scores \n");
-        printf("(4) fastest time in Amstel Gold Race and Paris Roubaix combined \n");
-        printf("(5) Avarage age of top 10 races \n\n");
+        printf("(1) Italians over 30 (Full list) \n");
+		printf("(2) Italians over 30 (Compact) \n");
+        printf("(3) Danish riders who has completed 1 or more races \n");
+        printf("(4) Top 10 point scores \n");
+        printf("(5) fastest time in Amstel Gold Race and Paris Roubaix combined \n");
+        printf("(6) Avarage age of top 10 races \n\n");
         printf("(0) Exit \n");
     
 
         scanf(" %d", &input);
         if(input == 1)
             italians_over_30(racers);
-        else if(input == 2)
-            danes_who_has_completed_a_race(racers);
+		if(input == 2)
+            print_italians_over_30_compact(racers);
         else if(input == 3)
-            most_points_total(racers);
+            danes_who_has_completed_a_race(racers);
         else if(input == 4)
-            best_time_in_paris_amstel(racers);
+            most_points_total(racers);
         else if(input == 5)
+            best_time_in_paris_amstel(racers);
+        else if(input == 6)
             avrage_age_of_top_10(racers);
         else if(input != 0)
             printf("\n ##### Didn't recognise input ##### \n");
