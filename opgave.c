@@ -46,6 +46,7 @@ void load_position(FILE*, racer*);
 void load_time(FILE*, racer*);
 int count_racers_in_race(racer*, int);
 void calc_points_per_racer(racer*, int, int);
+int is_same_person(racer*, racer*);
 
 
 
@@ -268,10 +269,7 @@ void italians_over_30(racer* racers){
     /* prints racers one by one, includeing all the races competed in and seperated by lines */
     for(loop = 0; strcmp(racer_pointer[loop].nationality, "ITA") == 0 && racer_pointer[loop].age >= 30; loop++){
         
-        if (strcmp(racer_pointer[loop].last_name, racer_pointer[loop -1].last_name) == 0 && strcmp(racer_pointer[loop].name, racer_pointer[loop -1].name) == 0)
-            is_former_same_person = 1;
-        else
-            is_former_same_person = 0;
+        is_former_same_person = is_same_person(&racer_pointer[loop], &racer_pointer[loop -1]);
         
         /* prints sepetator line if its a new person */
         if(is_former_same_person == 0)
@@ -357,7 +355,7 @@ danish_racer* make_danish_racer_array(racer *racers){
             x++;
             if(racer_pointer[x].position != DNF)
                 number_of_races++;
-        } while(strcmp(racer_pointer[x].name, racer_pointer[x + 1].name) == 0 && strcmp(racer_pointer[x].last_name, racer_pointer[x + 1].last_name) == 0);
+        } while(is_same_person(&racer_pointer[x], &racer_pointer[x + 1]));
         
         /* saves any racer who has completed 1 or more races to an array */
         if(number_of_races != 0){
@@ -422,7 +420,7 @@ void calc_total_points(racer* racers){
         number_of_times_listed = 0;
                 
         /* counts if any charater is listed multiple times in a row, and adds the points together */
-        while((strcmp(racer_pointer[loop].name, racer_pointer[loop + 1].name) == 0) && (strcmp(racer_pointer[loop].last_name, racer_pointer[loop + 1].last_name) == 0)){
+        while(is_same_person(&racer_pointer[loop], &racer_pointer[loop + 1])){
             loop++;
             total_points += racer_pointer[loop].points;
             number_of_times_listed++;
@@ -449,7 +447,7 @@ void most_points_total(racer* racers){
     
     while(number_of_racers <= 10){
         
-        if(!(strcmp(racer_pointer[x].name, racer_pointer[x - 1].name) == 0) && !(strcmp(racer_pointer[x].last_name, racer_pointer[x - 1].last_name) == 0)){
+        if(!is_same_person(&racer_pointer[x], &racer_pointer[x - 1])){
             printf("     %-20s| %-20s|         %-4d \n", racer_pointer[x].name, racer_pointer[x].last_name, racer_pointer[x].total_points);
             number_of_racers++;
         }
@@ -477,7 +475,7 @@ int sort_max_points(const void* a, const void* b){
 
 void best_time_in_paris_amstel(racer* racers){
     
-    int loop = 1, best_result = MAX, current_result, posistion_in_array;
+    int loop = 1, best_result = MAX, current_result = MAX, posistion_in_array;
     racer* racer_pointer = racers;
     
     qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_paris_amstel);
@@ -485,7 +483,7 @@ void best_time_in_paris_amstel(racer* racers){
     /* checks if any person is listed twice in a row, signifying they have partisipated in both races, then adding the times together and saving the fastest time */
     while(is_amstel_or_paris(&racer_pointer[loop])){
         
-        if((strcmp(racer_pointer[loop].name, racer_pointer[loop - 1].name) == 0) && (strcmp(racer_pointer[loop].last_name, racer_pointer[loop - 1].last_name) == 0))
+        if(is_same_person(&racer_pointer[loop], &racer_pointer[loop - 1]))
             current_result = racer_pointer[loop].time_total_secs + racer_pointer[loop - 1].time_total_secs;
             
         if(current_result < best_result){
@@ -533,7 +531,7 @@ void avrage_age_of_top_10(racer* racers){
     
     /* adds all ages together for every individual */
     for(loop = 0; racer_pointer[loop].position <= 10; loop++){
-        if((strcmp(racer_pointer[loop].name, racer_pointer[loop - 1].name) != 0)){
+        if(!is_same_person(&racer_pointer[loop], &racer_pointer[loop - 1])){
             number_of_people++;
             avarage_age += racer_pointer[loop].age;
         }
@@ -620,6 +618,10 @@ void print_all_info(racer* racers){
     printf("___________________________________________________________________________________________________ \n\n");
     avrage_age_of_top_10(racers);
     printf("___________________________________________________________________________________________________ \n");
+}
+
+int is_same_person(racer* person_1, racer* person_2){
+    return (strcmp(person_1->name, person_2->name) == 0) && (strcmp(person_1->last_name, person_2->last_name) == 0);
 }
 
 
