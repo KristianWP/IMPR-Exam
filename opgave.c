@@ -41,6 +41,7 @@ void take_terminal_input(char**, racer*);
 void take_user_input(racer*);
 void italians_over_30_compact(racer*);
 void print_all_info(racer*);
+void load_names(FILE*, racer*);
 
 
 
@@ -51,9 +52,9 @@ int main(int number_of_terminal_inputs, char **terminal_input){
    
     /* loads racers from file to array */
     load_racers(racers);  
-	/*
+	
 	take_terminal_input(terminal_input, racers);
-	*/
+	
 	take_user_input(racers);
 
     return 0;
@@ -61,21 +62,69 @@ int main(int number_of_terminal_inputs, char **terminal_input){
 
 void load_racers(racer* racers){
     
-    char first_letter, secound_letter, third_letter;
-    int loop = 0;
-    
-    FILE *data = fopen("cykelloeb", "r");
-    
+    char test_letter;    
+    FILE *data = fopen("cykelloeb", "r");    
     racer* racer_pointer = racers;
     
     /* load racers loop */
     while(feof(data) == 0){
         fscanf(data, " %s \"", racer_pointer->race_name);
         
-        fscanf(data, " %c", &first_letter);
-        fscanf(data, " %c", &secound_letter);
+        load_names(data, racer_pointer);
         
-        /* load in first name */
+        /* loads age, team and nationality */       
+        fscanf(data, " | %d", &racer_pointer->age);
+        fscanf(data, " %s", racer_pointer->team);
+        fscanf(data, " %s |", racer_pointer->nationality);   
+        
+        /* scans in position */
+        fscanf(data, " %c", &test_letter);
+        if(isdigit(test_letter)){
+            ungetc(test_letter, data);
+            fscanf(data, " %d", &racer_pointer->position);
+        }
+        else if (test_letter == 'O'){
+            racer_pointer->position = OTL;
+            while(test_letter != ' ')
+                fscanf(data, "%c", &test_letter);
+        }
+        else{
+            racer_pointer->position = DNF;
+            while(test_letter != ' ')
+                fscanf(data, "%c", &test_letter);
+        }
+        
+        /* loads in time to finish race */
+        fscanf(data, " %c ", &test_letter);
+        if(isdigit(test_letter)){
+            ungetc(test_letter, data);
+            fscanf(data, " %d:", &racer_pointer->hours);
+            fscanf(data, " %d:", &racer_pointer->minutes);
+            fscanf(data, " %d", &racer_pointer->secounds);
+            racer_pointer->time_total_secs = racer_pointer->hours * 3600 + racer_pointer->minutes * 60 + racer_pointer->secounds;
+        }
+        else{
+            racer_pointer->hours = MAX;
+            racer_pointer->minutes = MAX;
+            racer_pointer->secounds = MAX;
+            racer_pointer->time_total_secs = MAX;
+        }                
+        racer_pointer++;
+    }
+    fclose(data);
+
+	calc_points(racers);	
+}
+
+void load_names(FILE *data, racer* racer_pointer){
+    
+    char first_letter, secound_letter, third_letter;
+    int loop;
+    
+    fscanf(data, " %c", &first_letter);
+    fscanf(data, " %c", &secound_letter);
+    
+    /* load in first name */
         loop = 0;
         while(!(isupper(first_letter) && (isupper(secound_letter)))){
             racer_pointer->name[loop] = first_letter;
@@ -109,50 +158,7 @@ void load_racers(racer* racers){
                 break;
             }
         }
-        racer_pointer->last_name[loop] = '\0';
-        
-        /* loads age, team and nationality */       
-        fscanf(data, " | %d", &racer_pointer->age);
-        fscanf(data, " %s", racer_pointer->team);
-        fscanf(data, " %s |", racer_pointer->nationality);   
-        
-        /* scans in position */
-        fscanf(data, " %c", &first_letter);
-        if(isdigit(first_letter)){
-            ungetc(first_letter, data);
-            fscanf(data, " %d", &racer_pointer->position);
-        }
-        else if (first_letter == 'O'){
-            racer_pointer->position = OTL;
-            while(first_letter != ' ')
-                fscanf(data, "%c", &first_letter);
-        }
-        else{
-            racer_pointer->position = DNF;
-            while(first_letter != ' ')
-                fscanf(data, "%c", &first_letter);
-        }
-        
-        /* loads in time to finish race */
-        fscanf(data, " %c ", &first_letter);
-        if(isdigit(first_letter)){
-            ungetc(first_letter, data);
-            fscanf(data, " %d:", &racer_pointer->hours);
-            fscanf(data, " %d:", &racer_pointer->minutes);
-            fscanf(data, " %d", &racer_pointer->secounds);
-            racer_pointer->time_total_secs = racer_pointer->hours * 3600 + racer_pointer->minutes * 60 + racer_pointer->secounds;
-        }
-        else{
-            racer_pointer->hours = MAX;
-            racer_pointer->minutes = MAX;
-            racer_pointer->secounds = MAX;
-            racer_pointer->time_total_secs = MAX;
-        }                
-        racer_pointer++;
-    }
-    fclose(data);
-
-	calc_points(racers);	
+        racer_pointer->last_name[loop] = '\0';        
 }
 
 void calc_points(racer* racers){
@@ -257,6 +263,8 @@ void italians_over_30(racer* racers){
             printf("%-30s    position: %3d   time: %2d:%2d:%2d   points earned: %d \n", racer_pointer[loop].race_name, racer_pointer[loop].position, racer_pointer[loop].hours, racer_pointer[loop].minutes, racer_pointer[loop].secounds, racer_pointer[loop].points);
         
     }
+    
+    printf("___________________________________________________________________________________________________ \n\n");
 }
 
 void italians_over_30_compact(racer* racers){
