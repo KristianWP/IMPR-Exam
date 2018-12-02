@@ -51,9 +51,9 @@ int main(int number_of_terminal_inputs, char **terminal_input){
    
     /* loads racers from file to array */
     load_racers(racers);  
-	
+	/*
 	take_terminal_input(terminal_input, racers);
-	
+	*/
 	take_user_input(racers);
 
     return 0;
@@ -545,7 +545,7 @@ void take_user_input(racer* racers){
         scanf(" %d", &input);
         if(input == 1)
             italians_over_30(racers);
-		if(input == 2)
+		else if(input == 2)
             italians_over_30_compact(racers);
         else if(input == 3)
             danes_who_has_completed_a_race(racers);
