@@ -39,7 +39,8 @@ void avrage_age_of_top_10(racer*);
 int sort_top_10(const void*, const void*);
 void take_terminal_input(char**, racer*);
 void take_user_input(racer*);
-void italians_over_30_compact(racer* racers);
+void italians_over_30_compact(racer*);
+void print_all_info(racer*);
 
 
 
@@ -518,15 +519,7 @@ int sort_top_10(const void* a, const void* b){
 void take_terminal_input(char** terminal_input, racer* racers){
 	
 	if(strcmp(terminal_input[1], "--print") == 0){
-        italians_over_30_compact(racers);
-        printf("___________________________________________________________________________________________________ \n");
-        danes_who_has_completed_a_race(racers);
-        printf("___________________________________________________________________________________________________ \n");
-        most_points_total(racers);
-        printf("___________________________________________________________________________________________________ \n\n");
-        best_time_in_paris_amstel(racers);
-        printf("___________________________________________________________________________________________________ \n\n");
-        avrage_age_of_top_10(racers);
+        print_all_info(racers);
 		
 		exit(EXIT_SUCCESS);
     }
@@ -545,6 +538,7 @@ void take_user_input(racer* racers){
         printf("(4) Top 10 point scores \n");
         printf("(5) fastest time in Amstel Gold Race and Paris Roubaix combined \n");
         printf("(6) Avarage age of top 10 races \n\n");
+        printf("(7) Print all info (2-6) \n\n");
         printf("(0) Exit \n");
     
 
@@ -561,11 +555,26 @@ void take_user_input(racer* racers){
             best_time_in_paris_amstel(racers);
         else if(input == 6)
             avrage_age_of_top_10(racers);
+        else if(input == 7)
+            print_all_info(racers);
         else if(input != 0)
             printf("\n ##### Didn't recognise input ##### \n");
     } while(input != 0);
 }
 
+void print_all_info(racer* racers){
+    
+    italians_over_30_compact(racers);
+    printf("___________________________________________________________________________________________________ \n");
+    danes_who_has_completed_a_race(racers);
+    printf("___________________________________________________________________________________________________ \n");
+    most_points_total(racers);
+    printf("___________________________________________________________________________________________________ \n\n");
+    best_time_in_paris_amstel(racers);
+    printf("___________________________________________________________________________________________________ \n\n");
+    avrage_age_of_top_10(racers);
+    printf("___________________________________________________________________________________________________ \n");
+}
 
 
 
