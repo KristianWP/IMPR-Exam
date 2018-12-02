@@ -25,7 +25,6 @@ void calc_points(racer*);
 int sort_racers_by_race_name(const void*, const void*);
 void italians_over_30(racer*);
 int sort_italians_over_30(const void*, const void*);
-void print_italians_over_30(racer*);
 void danes_who_has_completed_a_race(racer*);
 int sort_danes_who_has_completed_a_race(const void*, const void*);
 danish_racer* make_danish_racer_array(racer*);
@@ -40,7 +39,7 @@ void avrage_age_of_top_10(racer*);
 int sort_top_10(const void*, const void*);
 void take_terminal_input(char**, racer*);
 void take_user_input(racer*);
-void print_italians_over_30_compact(racer* racers);
+void italians_over_30_compact(racer* racers);
 
 
 
@@ -207,13 +206,6 @@ void calc_points(racer* racers){
     calc_total_points(racers);
 }
 
-void italians_over_30(racer* racers){
-	
-	qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_italians_over_30);
-    
-    print_italians_over_30(racers);
-}
-
 int sort_italians_over_30(const void* a, const void* b){
     
     racer *pa = (racer*)a, *pb = (racer*)b;
@@ -235,10 +227,12 @@ int sort_italians_over_30(const void* a, const void* b){
     return result;
 }
 
-void print_italians_over_30(racer* racers){
+void italians_over_30(racer* racers){
     
     int loop, is_former_same_person;
     racer* racer_pointer = racers;
+    
+    qsort(racers, MAX_NUMBER_OF_RACERS, sizeof(racer), sort_italians_over_30);
     
     for(loop = 0; strcmp(racer_pointer[loop].nationality, "ITA") == 0 && racer_pointer[loop].age >= 30; loop++){
         
@@ -264,7 +258,7 @@ void print_italians_over_30(racer* racers){
     }
 }
 
-void print_italians_over_30_compact(racer* racers){
+void italians_over_30_compact(racer* racers){
 	
     int loop, number_of_times_listed;
     racer* racer_pointer = racers;
@@ -524,7 +518,7 @@ int sort_top_10(const void* a, const void* b){
 void take_terminal_input(char** terminal_input, racer* racers){
 	
 	if(strcmp(terminal_input[1], "--print") == 0){
-        print_italians_over_30_compact(racers);
+        italians_over_30_compact(racers);
         printf("___________________________________________________________________________________________________ \n");
         danes_who_has_completed_a_race(racers);
         printf("___________________________________________________________________________________________________ \n");
@@ -558,7 +552,7 @@ void take_user_input(racer* racers){
         if(input == 1)
             italians_over_30(racers);
 		if(input == 2)
-            print_italians_over_30_compact(racers);
+            italians_over_30_compact(racers);
         else if(input == 3)
             danes_who_has_completed_a_race(racers);
         else if(input == 4)
