@@ -286,6 +286,7 @@ void italians_over_30(racer* racers){
             printf("%-30s    position: %3d   time: %2d:%2d:%2d   points earned: %d \n", racer_pointer[loop].race_name, racer_pointer[loop].position, racer_pointer[loop].hours, racer_pointer[loop].minutes, racer_pointer[loop].secounds, racer_pointer[loop].points);
         
     }
+    printf("___________________________________________________________________________________________________ \n\n");
 }
 
 void italians_over_30_compact(racer* racers){
@@ -492,7 +493,7 @@ void best_time_in_paris_amstel(racer* racers){
         loop++;
     }
     
-    printf("\nFastest time in Paris Roubaix and Amstel Gold Race combined: %s %s   time: ", racer_pointer[posistion_in_array].name, racer_pointer[posistion_in_array].last_name);
+    printf("Fastest time in Paris Roubaix and Amstel Gold Race combined: %s %s   time: ", racer_pointer[posistion_in_array].name, racer_pointer[posistion_in_array].last_name);
     
     /* devides the total time in secounds into hours, minutes and secounds */
     printf("%d:%d:%d \n", best_result / 3600, (best_result % 3600) / 60, best_result % 60);
@@ -538,7 +539,7 @@ void avrage_age_of_top_10(racer* racers){
 
     avarage_age = avarage_age / number_of_people;
     
-    printf("\nThe avarage age of the top 10 racers is: %.2lf \n", avarage_age);
+    printf("The avarage age of the top 10 racers is: %.2lf \n", avarage_age);
     
 }
 
@@ -573,8 +574,7 @@ void take_user_input(racer* racers){
 	int input;
 	
 	do{
-        printf("___________________________________________________________________________________________________ \n\n");
-        printf("type in the number corrosponding to the info you wish displayed \n\n");
+        printf("\ntype in the number corrosponding to the info you wish displayed \n\n");
         
         printf("(1) Italians over 30 (Full list) \n");
 		printf("(2) Italians over 30 (Compact) \n");
@@ -585,6 +585,7 @@ void take_user_input(racer* racers){
         printf("(7) Print all info (2-6) \n\n");
         printf("(0) Exit \n");
     
+
         scanf(" %d", &input);
         if(input == 1)
             italians_over_30(racers);
@@ -602,7 +603,6 @@ void take_user_input(racer* racers){
             print_all_info(racers);
         else if(input != 0)
             printf("\n ##### Didn't recognise input ##### \n");
-        
     } while(input != 0);
 }
 
@@ -613,12 +613,16 @@ void print_all_info(racer* racers){
     danes_who_has_completed_a_race(racers);
     printf("___________________________________________________________________________________________________ \n");
     most_points_total(racers);
-    printf("___________________________________________________________________________________________________ \n");
+    printf("___________________________________________________________________________________________________ \n\n");
     best_time_in_paris_amstel(racers);
-    printf("___________________________________________________________________________________________________ \n");
+    printf("___________________________________________________________________________________________________ \n\n");
     avrage_age_of_top_10(racers);
+    printf("___________________________________________________________________________________________________ \n");
 }
 
 int is_same_person(racer* person_1, racer* person_2){
     return (strcmp(person_1->name, person_2->name) == 0) && (strcmp(person_1->last_name, person_2->last_name) == 0);
 }
+
+
+
