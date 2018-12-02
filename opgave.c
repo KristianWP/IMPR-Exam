@@ -50,7 +50,7 @@ int is_same_person(racer*, racer*);
 
 
 
-int main(int number_of_terminal_inputs, char **terminal_input){
+int main(int number_of_terminal_inputs, char *terminal_input[]){
     
     /* inisilase racer array */
     racer racers[MAX_NUMBER_OF_RACERS];
@@ -560,11 +560,10 @@ int sort_top_10(const void* a, const void* b){
     return result;
 }
 
-void take_terminal_input(char** terminal_input, racer* racers){
+void take_terminal_input(char* terminal_input[], racer* racers){
 	
 	if(strcmp(terminal_input[1], "--print") == 0){
         print_all_info(racers);
-		
 		exit(EXIT_SUCCESS);
     }
 }
@@ -582,7 +581,9 @@ void take_user_input(racer* racers){
         printf("(4) Top 10 point scores \n");
         printf("(5) fastest time in Amstel Gold Race and Paris Roubaix combined \n");
         printf("(6) Avarage age of top 10 races \n\n");
+        
         printf("(7) Print all info (2-6) \n\n");
+        
         printf("(0) Exit \n");
     
 
