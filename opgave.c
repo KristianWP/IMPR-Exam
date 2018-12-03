@@ -37,7 +37,7 @@ int sort_paris_amstel(const void*, const void*);
 int is_amstel_or_paris(racer*);
 void avrage_age_of_top_10(racer*);
 int sort_top_10(const void*, const void*);
-void take_terminal_input(char**, racer*);
+void take_terminal_input(char**, int, racer*);
 void take_user_input(racer*);
 void italians_over_30_compact(racer*);
 void print_all_info(racer*);
@@ -58,7 +58,7 @@ int main(int number_of_terminal_inputs, char *terminal_input[]){
     /* loads racers from file to array */
     load_racers(racers);  
 	
-	take_terminal_input(terminal_input, racers);
+	take_terminal_input(terminal_input, number_of_terminal_inputs, racers);
 	
 	take_user_input(racers);
 
@@ -560,11 +560,13 @@ int sort_top_10(const void* a, const void* b){
     return result;
 }
 
-void take_terminal_input(char* terminal_input[], racer* racers){
+void take_terminal_input(char* terminal_input[], int number_of_inputs, racer* racers){
 	
-	if(strcmp(terminal_input[1], "--print") == 0){
-        print_all_info(racers);
-		exit(EXIT_SUCCESS);
+    if(number_of_inputs == 2){
+        if(strcmp(terminal_input[1], "--print") == 0){
+            print_all_info(racers);
+            exit(EXIT_SUCCESS);
+        }
     }
 }
 
